@@ -31,7 +31,7 @@ public:
         aisle=QString::number(item.getAisle());
         aisleLoc=QString::number(item.getAisleLoc());
         QSqlQuery query;
-        query.prepare("INSERT INTO Produce_item(name, category, aisle, aisleLoc) "
+        query.prepare("INSERT INTO item(name, category, aisle, aisleLoc) "
                       "VALUES (:name, :category, :aisle, :aisleLoc)");
         query.bindValue(":name", name);
         query.bindValue(":category", category);
@@ -41,7 +41,7 @@ public:
     }
     bool dataExists(Item item){
         name=QString::fromStdString(item.getName());
-        QSqlQuery query("SELECT name FROM Produce_item WHERE name =(:name)");
+        QSqlQuery query("SELECT name FROM item WHERE name =(:name)");
         query.bindValue(":name", name);
         if(query.exec()){
             if(query.next()){
@@ -61,7 +61,7 @@ public:
         Item item;
         vector<Item> itemVec;
         QSqlQuery query;
-                query.prepare("SELECT * FROM Produce_item");
+                query.prepare("SELECT * FROM item");
         while(query.next()){
             QString name =query.value("name").toString();
             QString category= query.value("category").toString();
