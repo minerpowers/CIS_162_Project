@@ -1,8 +1,27 @@
-#include "item.h"
+#include "add_item.h"
+#include"database.h"
+#include"Item.h"
+#include"ShopList.h"
+#include"makeShopList.h"
+#include<vector>
 
 int main()
 {
-    Item test1;
-    test1.setName("test name");
-    cout <<endl<< test1.getName() <<endl;
+    ShopList testList;
+    testList=newList();
+    testList.PrintList();
+/* int choice;
+    do{
+        testList.enqueu(newItem());
+        cout << "1: enter another item\n"
+             << "2: exit";
+         cin >> choice;
+    }while(choice == 1);
+    testList.PrintList();
+    testList.sort();
+
+    cout<<"\nsorted list\n";
+    testList.PrintList();
+*/
+     return 0;
 }
