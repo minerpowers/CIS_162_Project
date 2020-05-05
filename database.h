@@ -32,7 +32,14 @@ public:
         }
         else{
             qDebug()<<"Database: connection ok";
-            return;
+            QSqlQuery query;
+            query.prepare("CREATE TABLE IF NOT EXISTS items (name VARCHAR(30), category VARCHAR(30), aisle INTEGER, aisleLoc INTEGER)");
+            if(!query.exec()){
+                qDebug() << query.lastError();
+            }
+            else{
+                qDebug() << "Table Created";
+            }
         }
     }
     /**************************************************************
@@ -53,18 +60,30 @@ public:
     * Output: none
     ***************************************************************/
     void addItem(Item item){
-        QString name=QString::fromStdString(item.getName());
-        QString category=QString::fromStdString(item.getCategory());
-        QString aisle=QString::number(item.getAisle());
-        QString aisleLoc=QString::number(item.getAisleLoc());
-        QSqlQuery query;
-        query.prepare("INSERT INTO Item(name, category, aisle, aisleLoc) "
-                      "VALUES (:name, :category, :aisle, :aisleLoc)");
-        query.bindValue(":name", name);
-        query.bindValue(":category", category);
-        query.bindValue(":aisle", aisle);
-        query.bindValue(":aisleLoc", aisleLoc);
-        query.exec();
+        if (isOpen()){
+            if(dataExists(item.getName())){
+                string error = "items areety exists\n";
+                throw error;
+            }
+            else{
+                QString name=QString::fromStdString(item.getName());
+                QString category=QString::fromStdString(item.getCategory());
+                QString aisle=QString::number(item.getAisle());
+                QString aisleLoc=QString::number(item.getAisleLoc());
+                QSqlQuery query;
+                query.prepare("INSERT INTO Items(name, category, aisle, aisleLoc) VALUES (:name, :category, :aisle, :aisleLoc)");
+                query.bindValue(":name", name);
+                query.bindValue(":category", category);
+                query.bindValue(":aisle", aisle);
+                query.bindValue(":aisleLoc", aisleLoc);
+                query.exec();
+                qDebug()<< "Item added\n";
+            }
+        }
+        else{
+            string error = "no conection to database\n\n";
+            throw error;
+        }
     }
     /**************************************************************
     * Name: dataExists
@@ -77,7 +96,7 @@ public:
         bool exists = false;
         QString name=QString::fromStdString(item);
         QSqlQuery query;
-        query.prepare("SELECT name FROM Item WHERE name =(:name)");
+        query.prepare("SELECT name FROM Items WHERE name =(:name)");
         query.bindValue(":name",name);
         if(query.exec()){
             if(query.next()){
@@ -105,21 +124,27 @@ public:
     * Output: vector of Items
     ***************************************************************/
     vector<Item> getItem(){
-        Item item;
         vector<Item> itemVec;
-        QSqlQuery query;
-        query.exec("SELECT name, category, aisle, aisleLoc FROM Item");
-        while(query.next()){
-            QString name = query.value(0).toString();
-            QString category= query.value(1).toString();
-            int aisle = query.value(2).toInt();
-            int aisleLoc = query.value(3).toInt();
-            qDebug()<<name<<category<<aisle<<aisleLoc;
-            item.setName(name.toStdString());
-            item.setCategory(category.toStdString());
-            item.setAisle(aisle);
-            item.setAisleLoc(aisleLoc);
-            itemVec.push_back(item);
+        if (isOpen()){
+            Item item;
+            QSqlQuery query;
+            query.exec("SELECT name, category, aisle, aisleLoc FROM Items");
+            while(query.next()){
+                QString name = query.value(0).toString();
+                QString category= query.value(1).toString();
+                int aisle = query.value(2).toInt();
+                int aisleLoc = query.value(3).toInt();
+                qDebug()<<name<<category<<aisle<<aisleLoc;
+                item.setName(name.toStdString());
+                item.setCategory(category.toStdString());
+                item.setAisle(aisle);
+                item.setAisleLoc(aisleLoc);
+                itemVec.push_back(item);
+            }
+        }
+        else{
+            string error = "no conection to database\n\n";
+            throw error;
         }
         return itemVec;
     }
