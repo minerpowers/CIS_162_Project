@@ -22,14 +22,21 @@
 #include"makeShopList.h"
 #include<vector>
 
-void menu_addItem(vector<Item>&);
-void print_ShopList(ShopList&);
-void testData(vector<Item>&);
+void menu_addItem();                // cunction to call add_item.h
+void print_ShopList(ShopList&);     // functio to print the shopping list
+//void testData();
+DbManager db;
 int main()
 {
+
     ShopList shoppingList;
     vector<Item> allItems;
-    testData(allItems);
+    //testData();
+    try {
+        allItems = db.getItem();
+    } catch (string error) {
+        cout<< error;
+    }
     int choice;
     do{
         choice=0;
@@ -43,7 +50,7 @@ int main()
         switch (choice) {
         case 1: makeList(allItems,shoppingList,0);
             break;
-        case 2: menu_addItem(allItems);
+        case 2: menu_addItem();
             break;
         case 3: print_ShopList(shoppingList);
             break;
@@ -55,8 +62,13 @@ int main()
      return 0;
 }
 
-void menu_addItem(vector<Item> &items){
-    items.push_back(newItem());
+void menu_addItem(){
+    Item item = newItem();
+    try {
+        db.addItem(item);
+    } catch (string err) {
+        cout << err;
+    }
     int choice;
     do{
 
@@ -66,7 +78,12 @@ void menu_addItem(vector<Item> &items){
          <<"Enter 1 or 2\t";
         cin>>choice;
         switch (choice) {
-        case 1: items.push_back(newItem());
+        case 1: item = newItem();
+            try {
+                db.addItem(item);
+            } catch (string err) {
+                    cout << err;
+            }
             break;
         case 2: return;
         default:cout<<"Invalid input\n";
@@ -81,35 +98,36 @@ void print_ShopList(ShopList &list){
             list.PrintList();
     }
 }
-// data for testing
-void testData(vector<Item> &items){
+/* data for testing
+void testData(){
     Item apple("apple","Produce",0,1);
-    items.push_back(apple);
     Item banana("banana","Produce",0,1);
-    items.push_back(banana);
     Item milk("milk","Dairy",26,3);
-    items.push_back(milk);
     Item icecream("icecream","Frozen",22,2);
-    items.push_back(icecream);
     Item froDin("frozen Dinners","Frozen",20,1);
-    items.push_back(froDin);
     Item PB("Peanut Butter","Dry Goods",2,1);
-    items.push_back(PB);
     Item bread("bread","Dry Goods",1,2);
-    items.push_back(bread);
     Item slCh("sliced cheese","Deli",0,1);
-    items.push_back(slCh);
     Item flour("flour","Dry Goods",8,1);
-    items.push_back(flour);
     Item sugar("sugar","Dry Goods",8,3);
-    items.push_back(sugar);
     Item life("life ceareal","Dry Goods",10,2);
-    items.push_back(life);
     Item loops("fruit loops","Dry Goods",10,3);
-    items.push_back(loops);
     Item chex("chex","Dry Goods",10,1);
-    items.push_back(chex);
     Item yog("yogurt","Dairy",24,1);
-    items.push_back(yog);
+    db.addItem(apple);
+    db.addItem(banana);
+    db.addItem(milk);
+    db.addItem(icecream);
+    db.addItem(froDin);
+    db.addItem(PB);
+    db.addItem(bread);
+    db.addItem(slCh);
+    db.addItem(flour);
+    db.addItem(sugar);
+    db.addItem(life);
+    db.addItem(life);
+    db.addItem(loops);
+    db.addItem(chex);
+    db.addItem(yog);
     return;
-}
+}*/
